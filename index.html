@@ -2,680 +2,1038 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>牙齿洁白提醒助手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>牙齿洁白提醒助手 - 修复版</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #2196F3;
+            --danger: #F44336;
+            --warning: #FF9800;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            background: #f0f4fa;
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            padding: 20px 16px 60px;
-            color: #1f2937;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.6;
         }
-
-        .app-container { max-width: 600px; margin: 0 auto; }
-
-        /* 头部 */
-        .header { text-align: center; margin-bottom: 24px; }
-        .header h1 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #2b6e9f, #1e4a6e);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        .header p { font-size: 0.82rem; color: #5c6f87; margin-top: 6px; }
-
-        /* 卡片 */
-        .card {
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .section {
             background: white;
-            border-radius: 24px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
-            padding: 18px;
-            margin-bottom: 18px;
-            border: 1px solid #e8eef8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
-
-        /* 任务头 */
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+        
+        .date-display {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin-bottom: 20px;
+            padding: 10px;
+            background: var(--light);
+            border-radius: 8px;
+        }
+        
+        .task-card {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        
         .task-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .task-header h2 { font-size: 1.2rem; font-weight: 700; }
-        .date-badge {
-            font-size: 0.72rem;
-            background: #eef3ff;
-            padding: 4px 12px;
-            border-radius: 40px;
-            color: #1e5a8a;
-            font-weight: 500;
-        }
-
-        /* 单条任务项 */
-        .routine-item {
-            background: #f6f9fd;
-            border-radius: 18px;
-            padding: 14px 16px;
             margin-bottom: 12px;
-            border: 1px solid #e8eef6;
         }
-        .routine-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .routine-info { flex: 1; }
-        .routine-info h3 {
-            font-size: 0.95rem;
+        
+        .task-name {
             font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .task-time {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .task-actions {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
-            margin-bottom: 4px;
         }
-        .badge-tip {
-            background: #e6f4ea;
-            color: #2c6e3c;
-            font-size: 0.65rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-weight: normal;
-        }
-        .desc { font-size: 0.72rem; color: #5a6e8a; line-height: 1.4; }
-
-        /* 按钮组 */
-        .btn-group { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
-        .btn-sm {
-            border: 1.5px solid #cddae9;
-            padding: 7px 14px;
-            border-radius: 40px;
-            font-size: 0.78rem;
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
-            transition: 0.15s;
-            background: white;
-            color: #2c5f8a;
-            white-space: nowrap;
-        }
-        .btn-sm.active {
-            background: #2b6e9f;
-            border-color: #2b6e9f;
-            color: white;
-            box-shadow: 0 2px 8px rgba(43,110,159,0.25);
-        }
-
-        /* 内嵌拍照区域 */
-        .inline-photo-area {
-            margin-top: 12px;
-            display: none; /* 默认隐藏，点完成后展开 */
-        }
-        .inline-photo-area.visible { display: block; }
-
-        .photo-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .thumb-preview {
-            width: 68px;
-            height: 68px;
-            border-radius: 14px;
-            object-fit: cover;
-            border: 1.5px solid #dde6f0;
-            background: #eef2f8;
-            flex-shrink: 0;
-        }
-        .photo-btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-        .capture-btn {
-            background: #f0f5fb;
-            border: 1.5px dashed #9aaebf;
-            border-radius: 40px;
-            padding: 7px 14px;
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.78rem;
-            font-weight: 500;
-            cursor: pointer;
-            color: #2c5f8a;
-            white-space: nowrap;
         }
-        .capture-btn:active { background: #dde8f5; }
-
-        .save-inline-btn {
-            background: #2b6e9f;
-            border: none;
+        
+        .btn-primary {
+            background-color: var(--primary);
             color: white;
-            padding: 9px 18px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-            display: block;
-            width: 100%;
-            text-align: center;
-            transition: 0.15s;
         }
-        .save-inline-btn:active { background: #1e5a8a; transform: scale(0.98); }
-        .save-inline-btn:disabled {
-            background: #b0c4d8;
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--dark);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
-
-        .saved-hint {
-            font-size: 0.7rem;
-            color: #2c8a50;
-            margin-top: 6px;
-            display: none;
+        
+        .progress-bar {
+            height: 6px;
+            background-color: var(--border);
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
         }
-        .saved-hint.show { display: block; }
-
-        input[type="file"] { display: none; }
-
-        /* 进度条 */
-        .progress-tag {
-            background: #eef2ff;
-            border-radius: 20px;
-            padding: 11px 16px;
-            font-size: 0.75rem;
-            color: #2c5f8a;
-            margin-top: 4px;
-            font-weight: 500;
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
         }
-
-        /* 洁白相册卡片 */
-        .gallery-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 2px;
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--gray);
         }
-        .history-item {
-            background: #fafbfd;
-            border-radius: 18px;
-            padding: 12px;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            border: 1px solid #edf2f7;
+        
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
         }
-        .history-img {
-            width: 62px;
-            height: 62px;
-            border-radius: 14px;
+        
+        .photo-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            background-color: var(--light);
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            background: #eef2f8;
-            flex-shrink: 0;
         }
-        .history-info { flex: 1; min-width: 0; }
-        .history-date { font-weight: 600; font-size: 0.78rem; }
-        .history-note { font-size: 0.68rem; color: #6c7c98; margin-top: 3px; line-height: 1.4; }
+        
+        .photo-date {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+        
         .delete-btn {
-            background: none;
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(255, 255, 255, 0.9);
             border: none;
-            font-size: 1.1rem;
-            color: #b0bccf;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            padding: 6px;
-            flex-shrink: 0;
+            font-size: 0.8rem;
         }
+        
         .empty-state {
             text-align: center;
-            padding: 32px 16px;
-            color: #8c9bb0;
-            font-size: 0.82rem;
+            padding: 40px 20px;
+            color: var(--gray);
         }
-
-        .card-title-row {
+        
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
+            margin-bottom: 20px;
         }
-        .card-title-row h2 { font-size: 1.1rem; font-weight: 700; }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #ccd8e4;
-            padding: 6px 12px;
-            border-radius: 40px;
-            font-size: 0.7rem;
+        
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
             cursor: pointer;
-            color: #5a6e8a;
+            color: var(--gray);
         }
-
-        footer {
+        
+        .camera-preview {
+            width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .camera-preview video,
+        .camera-preview canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .compression-info {
+            background: var(--light);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .compression-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .compression-value {
             text-align: center;
-            font-size: 0.68rem;
-            color: #9aaebe;
-            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--gray);
         }
-
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
         @media (max-width: 480px) {
-            body { padding: 14px 12px 50px; }
-            .routine-top { flex-direction: column; align-items: flex-start; }
-            .btn-group { align-self: flex-end; }
+            body {
+                padding: 15px;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .task-actions {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-<div class="app-container">
+    <header>
+        <h1>🦷 牙齿洁白提醒助手</h1>
+        <p class="subtitle">坚持记录 · 见证亮白变化</p>
+    </header>
 
-    <div class="header">
-        <h1>🦷 洁白牙齿助手</h1>
-        <p>坚持记录 · 见证亮白变化</p>
+    <div class="date-display" id="currentDate">
+        <!-- 日期将通过JS动态显示 -->
     </div>
 
-    <!-- 今日任务卡片 -->
-    <div class="card">
-        <div class="task-header">
-            <h2>📋 今日护理</h2>
-            <div class="date-badge" id="currentDate"></div>
+    <div class="section">
+        <div class="section-title">
+            <span>📋</span>
+            <h2>今日护理</h2>
         </div>
-
-        <!-- 晨间刷牙 -->
-        <div class="routine-item" id="morningBrushItem">
-            <div class="routine-top">
-                <div class="routine-info">
-                    <h3>🌅 晨间刷牙 <span class="badge-tip">≥2分钟 · 巴氏刷牙法</span></h3>
-                    <div class="desc">牙刷45°角对准牙龈沟，小幅度震颤，电动牙刷更省力。</div>
+        
+        <div class="task-card" data-type="morning">
+            <div class="task-header">
+                <div>
+                    <div class="task-name">🌅 晨间刷牙</div>
+                    <div class="task-time">≥2分钟，巴氏刷牙法</div>
                 </div>
-                <div class="btn-group">
-                    <button class="btn-sm" data-task="morningBrush" data-status="done">✅ 完成</button>
-                    <button class="btn-sm" data-task="morningBrush" data-status="pending">⏳ 未做</button>
-                </div>
+                <span class="task-status" id="morningStatus">⏳ 未做</span>
             </div>
-            <!-- 内嵌拍照区 -->
-            <div class="inline-photo-area" id="morningBrushPhotoArea">
-                <div class="photo-row">
-                    <img class="thumb-preview" id="morningBrushThumb" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eef2f8'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%238a99b0' font-size='11'%3E待拍照%3C/text%3E%3C/svg%3E" alt="预览">
-                    <div class="photo-btn-group">
-                        <label class="capture-btn" for="morningBrushCamera">📷 拍摄</label>
-                        <label class="capture-btn" for="morningBrushAlbum">🖼️ 相册</label>
-                    </div>
-                </div>
-                <input type="file" id="morningBrushCamera" accept="image/*" capture="environment">
-                <input type="file" id="morningBrushAlbum" accept="image/*">
-                <button class="save-inline-btn" id="morningBrushSaveBtn" disabled>💾 保存晨刷记录</button>
-                <div class="saved-hint" id="morningBrushSavedHint">✅ 已保存到洁白相册</div>
+            <div class="task-actions">
+                <button class="btn btn-primary complete-btn" data-type="morning">
+                    <span>✅</span> 完成
+                </button>
+                <button class="btn btn-secondary camera-btn" data-type="morning">
+                    <span>📷</span> 拍摄
+                </button>
+                <button class="btn btn-outline album-btn" data-type="morning">
+                    <span>🖼️</span> 相册
+                </button>
             </div>
         </div>
 
-        <!-- 晚间刷牙 -->
-        <div class="routine-item" id="eveningBrushItem">
-            <div class="routine-top">
-                <div class="routine-info">
-                    <h3>🌙 晚间刷牙 <span class="badge-tip">≥2分钟 · 巴氏刷牙法</span></h3>
-                    <div class="desc">仔细清洁每个牙面，搭配电动牙刷效果更佳。</div>
+        <div class="task-card" data-type="evening">
+            <div class="task-header">
+                <div>
+                    <div class="task-name">🌙 晚间刷牙</div>
+                    <div class="task-time">≥2分钟，巴氏刷牙法</div>
                 </div>
-                <div class="btn-group">
-                    <button class="btn-sm" data-task="eveningBrush" data-status="done">✅ 完成</button>
-                    <button class="btn-sm" data-task="eveningBrush" data-status="pending">⏳ 未做</button>
-                </div>
+                <span class="task-status" id="eveningStatus">⏳ 未做</span>
             </div>
-            <div class="inline-photo-area" id="eveningBrushPhotoArea">
-                <div class="photo-row">
-                    <img class="thumb-preview" id="eveningBrushThumb" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eef2f8'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%238a99b0' font-size='11'%3E待拍照%3C/text%3E%3C/svg%3E" alt="预览">
-                    <div class="photo-btn-group">
-                        <label class="capture-btn" for="eveningBrushCamera">📷 拍摄</label>
-                        <label class="capture-btn" for="eveningBrushAlbum">🖼️ 相册</label>
-                    </div>
-                </div>
-                <input type="file" id="eveningBrushCamera" accept="image/*" capture="environment">
-                <input type="file" id="eveningBrushAlbum" accept="image/*">
-                <button class="save-inline-btn" id="eveningBrushSaveBtn" disabled>💾 保存晚刷记录</button>
-                <div class="saved-hint" id="eveningBrushSavedHint">✅ 已保存到洁白相册</div>
+            <div class="task-actions">
+                <button class="btn btn-primary complete-btn" data-type="evening">
+                    <span>✅</span> 完成
+                </button>
+                <button class="btn btn-secondary camera-btn" data-type="evening">
+                    <span>📷</span> 拍摄
+                </button>
+                <button class="btn btn-outline album-btn" data-type="evening">
+                    <span>🖼️</span> 相册
+                </button>
             </div>
         </div>
 
-        <!-- 其他时间段刷牙 -->
-        <div class="routine-item" id="otherBrushItem">
-            <div class="routine-top">
-                <div class="routine-info">
-                    <h3>☀️ 其他时间段刷牙 <span class="badge-tip">午后或任意时间</span></h3>
-                    <div class="desc">饭后30分钟刷牙效果最佳，记录每一次额外的清洁努力。</div>
+        <div class="task-card" data-type="extra">
+            <div class="task-header">
+                <div>
+                    <div class="task-name">☀️ 其他时间段刷牙</div>
+                    <div class="task-time">午后或任意时间</div>
                 </div>
-                <div class="btn-group">
-                    <button class="btn-sm" data-task="otherBrush" data-status="done">✅ 完成</button>
-                    <button class="btn-sm" data-task="otherBrush" data-status="pending">⏳ 未做</button>
-                </div>
+                <span class="task-status" id="extraStatus">⏳ 未做</span>
             </div>
-            <div class="inline-photo-area" id="otherBrushPhotoArea">
-                <div class="photo-row">
-                    <img class="thumb-preview" id="otherBrushThumb" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eef2f8'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%238a99b0' font-size='11'%3E待拍照%3C/text%3E%3C/svg%3E" alt="预览">
-                    <div class="photo-btn-group">
-                        <label class="capture-btn" for="otherBrushCamera">📷 拍摄</label>
-                        <label class="capture-btn" for="otherBrushAlbum">🖼️ 相册</label>
-                    </div>
-                </div>
-                <input type="file" id="otherBrushCamera" accept="image/*" capture="environment">
-                <input type="file" id="otherBrushAlbum" accept="image/*">
-                <button class="save-inline-btn" id="otherBrushSaveBtn" disabled>💾 保存记录</button>
-                <div class="saved-hint" id="otherBrushSavedHint">✅ 已保存到洁白相册</div>
+            <div class="task-actions">
+                <button class="btn btn-primary complete-btn" data-type="extra">
+                    <span>✅</span> 完成
+                </button>
+                <button class="btn btn-secondary camera-btn" data-type="extra">
+                    <span>📷</span> 拍摄
+                </button>
+                <button class="btn btn-outline album-btn" data-type="extra">
+                    <span>🖼️</span> 相册
+                </button>
             </div>
         </div>
 
-        <div class="progress-tag" id="dailyProgressMsg">📌 今日进度：待完成</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">今日已完成 0/3 项护理</div>
     </div>
 
-    <!-- 洁白相册卡片 -->
-    <div class="card">
-        <div class="card-title-row">
-            <h2>📅 洁白相册</h2>
-            <button id="clearAllHistoryBtn" class="btn-outline">清空全部</button>
+    <div class="section">
+        <div class="section-title">
+            <span>📅</span>
+            <h2>洁白相册</h2>
+            <div style="margin-left: auto;">
+                <button class="btn btn-danger" id="clearAllBtn">
+                    <span>🗑️</span> 清空全部
+                </button>
+            </div>
         </div>
-        <div id="historyGalleryContainer">
-            <div class="empty-state">📷 暂无洁牙影像记录，完成清洁后拍照保存吧~</div>
+        
+        <div id="photoGallery" class="photo-gallery">
+            <!-- 照片将通过JS动态加载 -->
+            <div class="empty-state">
+                <div>📸</div>
+                <p>暂无照片记录</p>
+                <p style="font-size: 0.9rem; margin-top: 10px;">点击上方"拍摄"按钮记录牙齿状态</p>
+            </div>
         </div>
     </div>
 
-    <footer>✨ 巴氏刷牙法 · 每日打卡见证改变</footer>
-</div>
+    <!-- 状态消息 -->
+    <div id="statusMessage" class="status-message"></div>
 
-<script>
-    const STORAGE_TASKS  = 'teeth_v2_daily_tasks';
-    const STORAGE_PHOTOS = 'teeth_v2_photos';
+    <!-- 相机模态框 -->
+    <div id="cameraModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📷 拍摄牙齿照片</div>
+                <button class="close-btn" id="closeCameraBtn">&times;</button>
+            </div>
+            
+            <div class="compression-info">
+                <p><strong>📱 手机拍照优化：</strong>自动压缩高分辨率照片，解决保存问题</p>
+                <p>原图大小：<span id="originalSize">--</span></p>
+                <p>压缩后大小：<span id="compressedSize">--</span></p>
+                <p>压缩比例：<span id="compressionRatio">--</span></p>
+            </div>
+            
+            <div class="camera-preview">
+                <video id="cameraVideo" autoplay playsinline></video>
+                <canvas id="cameraCanvas" style="display: none;"></canvas>
+                <img id="capturedImage" style="display: none; width: 100%;" alt="已拍摄的照片">
+            </div>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <label style="display: block; margin-bottom: 10px;">图片质量调整：</label>
+                <input type="range" min="0.1" max="1" step="0.1" value="0.7" class="compression-slider" id="qualitySlider">
+                <div class="compression-value">质量：<span id="qualityValue">0.7</span> (较高画质，较小文件)</div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn btn-primary" id="captureBtn">
+                    <span>📸</span> 拍照
+                </button>
+                <button class="btn btn-secondary" id="retakeBtn" style="display: none;">
+                    <span>🔄</span> 重拍
+                </button>
+                <button class="btn btn-warning" id="savePhotoBtn" style="display: none;">
+                    <span>💾</span> 保存照片
+                </button>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <p style="font-size: 0.9rem; color: var(--gray);">
+                    提示：高质量照片会自动压缩，确保在手机上正常保存
+                </p>
+            </div>
+        </div>
+    </div>
 
-    // ---- 工具 ----
-    function getTodayStr() {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    }
+    <!-- 相册选择模态框 -->
+    <div id="albumModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🖼️ 从相册选择</div>
+                <button class="close-btn" id="closeAlbumBtn">&times;</button>
+            </div>
+            
+            <div class="compression-info">
+                <p><strong>📱 图片压缩：</strong>自动优化大尺寸图片，解决保存问题</p>
+                <p>选择图片后会自动压缩以适配存储限制</p>
+            </div>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <label style="display: block; margin-bottom: 10px;">图片质量调整：</label>
+                <input type="range" min="0.1" max="1" step="0.1" value="0.7" class="compression-slider" id="albumQualitySlider">
+                <div class="compression-value">质量：<span id="albumQualityValue">0.7</span> (较高画质，较小文件)</div>
+            </div>
+            
+            <div style="text-align: center;">
+                <input type="file" id="albumInput" accept="image/*" style="display: none;">
+                <button class="btn btn-primary" id="selectAlbumBtn">
+                    <span>📁</span> 选择图片
+                </button>
+                <button class="btn btn-warning" id="saveAlbumBtn" style="display: none; margin-left: 10px;">
+                    <span>💾</span> 保存图片
+                </button>
+            </div>
+            
+            <div id="albumPreview" style="margin-top: 20px; text-align: center;">
+                <img id="selectedImage" style="max-width: 100%; max-height: 300px; border-radius: 8px; display: none;" alt="选择的图片">
+            </div>
+        </div>
+    </div>
 
-    function getTodayTasks() {
-        const today = getTodayStr();
-        const all = JSON.parse(localStorage.getItem(STORAGE_TASKS) || '{}');
-        if (!all[today]) all[today] = { morningBrush: false, eveningBrush: false, otherBrush: false };
-        return all[today];
-    }
-
-    function saveTodayTask(key, val) {
-        const today = getTodayStr();
-        const all = JSON.parse(localStorage.getItem(STORAGE_TASKS) || '{}');
-        if (!all[today]) all[today] = { morningBrush: false, eveningBrush: false, otherBrush: false };
-        all[today][key] = val;
-        localStorage.setItem(STORAGE_TASKS, JSON.stringify(all));
-    }
-
-    // ---- 每条任务的配置 ----
-    const TASK_CONFIG = [
-        {
-            key: 'morningBrush',
-            label: '晨间刷牙',
-            itemId: 'morningBrushItem',
-            photoAreaId: 'morningBrushPhotoArea',
-            thumbId: 'morningBrushThumb',
-            cameraInputId: 'morningBrushCamera',
-            albumInputId: 'morningBrushAlbum',
-            saveBtnId: 'morningBrushSaveBtn',
-            hintId: 'morningBrushSavedHint',
-        },
-        {
-            key: 'eveningBrush',
-            label: '晚间刷牙',
-            itemId: 'eveningBrushItem',
-            photoAreaId: 'eveningBrushPhotoArea',
-            thumbId: 'eveningBrushThumb',
-            cameraInputId: 'eveningBrushCamera',
-            albumInputId: 'eveningBrushAlbum',
-            saveBtnId: 'eveningBrushSaveBtn',
-            hintId: 'eveningBrushSavedHint',
-        },
-        {
-            key: 'otherBrush',
-            label: '其他时间段刷牙',
-            itemId: 'otherBrushItem',
-            photoAreaId: 'otherBrushPhotoArea',
-            thumbId: 'otherBrushThumb',
-            cameraInputId: 'otherBrushCamera',
-            albumInputId: 'otherBrushAlbum',
-            saveBtnId: 'otherBrushSaveBtn',
-            hintId: 'otherBrushSavedHint',
-        },
-    ];
-
-    // 每个任务的临时图片暂存
-    const pendingImages = { morningBrush: null, eveningBrush: null, otherBrush: null };
-
-    // ---- 初始化每条任务的交互 ----
-    function initTaskItem(cfg) {
-        const item      = document.getElementById(cfg.itemId);
-        const photoArea = document.getElementById(cfg.photoAreaId);
-        const thumb     = document.getElementById(cfg.thumbId);
-        const cameraInput = document.getElementById(cfg.cameraInputId);
-        const albumInput  = document.getElementById(cfg.albumInputId);
-        const saveBtn   = document.getElementById(cfg.saveBtnId);
-        const hint      = document.getElementById(cfg.hintId);
-
-        const doneBtn    = item.querySelector(`.btn-sm[data-status="done"]`);
-        const pendingBtn = item.querySelector(`.btn-sm[data-status="pending"]`);
-
-        // 完成/未做按钮
-        doneBtn.addEventListener('click', () => {
-            saveTodayTask(cfg.key, true);
-            doneBtn.classList.add('active');
-            pendingBtn.classList.remove('active');
-            photoArea.classList.add('visible');   // 展开拍照区
-            updateProgressMessage();
-            showToast(cfg.key);
-        });
-        pendingBtn.addEventListener('click', () => {
-            saveTodayTask(cfg.key, false);
-            pendingBtn.classList.add('active');
-            doneBtn.classList.remove('active');
-            photoArea.classList.remove('visible'); // 收起拍照区
-            updateProgressMessage();
-        });
-
-        // 处理图片选择（拍摄 & 相册共用同一个处理函数）
-        function handleFileSelect(input) {
-            input.addEventListener('change', (e) => {
-                const file = e.target.files[0];
+    <script>
+        class TeethHelper {
+            constructor() {
+                this.currentTaskType = null;
+                this.currentPhoto = null;
+                this.cameraStream = null;
+                this.photoQuality = 0.7;
+                this.maxPhotoSize = 1024; // 最大宽度/高度
+                
+                this.initializeApp();
+            }
+            
+            initializeApp() {
+                this.updateDate();
+                this.loadProgress();
+                this.loadPhotos();
+                this.setupEventListeners();
+                this.updateProgress();
+            }
+            
+            updateDate() {
+                const now = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const dateString = now.toLocaleDateString('zh-CN', options);
+                document.getElementById('currentDate').textContent = dateString;
+            }
+            
+            loadProgress() {
+                const saved = localStorage.getItem('teeth_v2_daily_tasks');
+                if (saved) {
+                    this.progress = JSON.parse(saved);
+                } else {
+                    this.progress = {
+                        morning: false,
+                        evening: false,
+                        extra: false
+                    };
+                }
+                
+                // 更新UI状态
+                this.updateTaskStatus('morning', this.progress.morning);
+                this.updateTaskStatus('evening', this.progress.evening);
+                this.updateTaskStatus('extra', this.progress.extra);
+            }
+            
+            updateTaskStatus(type, completed) {
+                const statusElement = document.getElementById(`${type}Status`);
+                if (statusElement) {
+                    statusElement.textContent = completed ? '✅ 完成' : '⏳ 未做';
+                }
+            }
+            
+            saveProgress() {
+                localStorage.setItem('teeth_v2_daily_tasks', JSON.stringify(this.progress));
+                this.updateProgress();
+            }
+            
+            updateProgress() {
+                const completed = Object.values(this.progress).filter(v => v).length;
+                const total = Object.keys(this.progress).length;
+                const percentage = (completed / total) * 100;
+                
+                document.getElementById('progressFill').style.width = `${percentage}%`;
+                document.getElementById('progressText').textContent = `今日已完成 ${completed}/${total} 项护理`;
+            }
+            
+            loadPhotos() {
+                const saved = localStorage.getItem('teeth_v2_photos');
+                const photos = saved ? JSON.parse(saved) : [];
+                this.displayPhotos(photos);
+            }
+            
+            displayPhotos(photos) {
+                const gallery = document.getElementById('photoGallery');
+                
+                if (photos.length === 0) {
+                    gallery.innerHTML = `
+                        <div class="empty-state">
+                            <div>📸</div>
+                            <p>暂无照片记录</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">点击上方"拍摄"按钮记录牙齿状态</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                gallery.innerHTML = photos.map((photo, index) => `
+                    <div class="photo-item">
+                        <img src="${photo.data}" alt="牙齿照片 ${index + 1}" loading="lazy">
+                        <div class="photo-date">${photo.date}</div>
+                        <button class="delete-btn" data-index="${index}">×</button>
+                    </div>
+                `).join('');
+                
+                // 添加删除事件监听
+                gallery.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const index = parseInt(btn.dataset.index);
+                        this.deletePhoto(index);
+                    });
+                });
+            }
+            
+            deletePhoto(index) {
+                const saved = localStorage.getItem('teeth_v2_photos');
+                const photos = saved ? JSON.parse(saved) : [];
+                
+                if (index >= 0 && index < photos.length) {
+                    photos.splice(index, 1);
+                    localStorage.setItem('teeth_v2_photos', JSON.stringify(photos));
+                    this.loadPhotos();
+                    this.showStatus('照片已删除', 'success');
+                }
+            }
+            
+            setupEventListeners() {
+                // 完成任务按钮
+                document.querySelectorAll('.complete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const type = e.target.closest('.complete-btn').dataset.type;
+                        this.markComplete(type);
+                    });
+                });
+                
+                // 拍照按钮
+                document.querySelectorAll('.camera-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.currentTaskType = e.target.closest('.camera-btn').dataset.type;
+                        this.openCamera();
+                    });
+                });
+                
+                // 相册按钮
+                document.querySelectorAll('.album-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.currentTaskType = e.target.closest('.album-btn').dataset.type;
+                        this.openAlbum();
+                    });
+                });
+                
+                // 清空全部按钮
+                document.getElementById('clearAllBtn').addEventListener('click', () => {
+                    if (confirm('确定要清空所有照片记录吗？此操作不可撤销。')) {
+                        localStorage.removeItem('teeth_v2_photos');
+                        this.loadPhotos();
+                        this.showStatus('所有照片已清空', 'success');
+                    }
+                });
+                
+                // 相机模态框相关
+                document.getElementById('closeCameraBtn').addEventListener('click', () => this.closeCamera());
+                document.getElementById('captureBtn').addEventListener('click', () => this.capturePhoto());
+                document.getElementById('retakeBtn').addEventListener('click', () => this.retakePhoto());
+                document.getElementById('savePhotoBtn').addEventListener('click', () => this.savePhoto());
+                
+                // 质量滑块
+                document.getElementById('qualitySlider').addEventListener('input', (e) => {
+                    this.photoQuality = parseFloat(e.target.value);
+                    document.getElementById('qualityValue').textContent = this.photoQuality.toFixed(1);
+                });
+                
+                // 相册模态框相关
+                document.getElementById('closeAlbumBtn').addEventListener('click', () => this.closeAlbum());
+                document.getElementById('selectAlbumBtn').addEventListener('click', () => {
+                    document.getElementById('albumInput').click();
+                });
+                document.getElementById('saveAlbumBtn').addEventListener('click', () => this.saveAlbumPhoto());
+                
+                // 相册质量滑块
+                document.getElementById('albumQualitySlider').addEventListener('input', (e) => {
+                    this.photoQuality = parseFloat(e.target.value);
+                    document.getElementById('albumQualityValue').textContent = this.photoQuality.toFixed(1);
+                });
+                
+                // 文件选择
+                document.getElementById('albumInput').addEventListener('change', (e) => {
+                    this.handleAlbumSelect(e);
+                });
+            }
+            
+            markComplete(type) {
+                this.progress[type] = !this.progress[type];
+                this.updateTaskStatus(type, this.progress[type]);
+                this.saveProgress();
+                
+                const status = this.progress[type] ? '完成' : '取消完成';
+                this.showStatus(`已${status} ${this.getTaskName(type)}`, 'success');
+            }
+            
+            getTaskName(type) {
+                const names = {
+                    morning: '晨间刷牙',
+                    evening: '晚间刷牙',
+                    extra: '其他时间段刷牙'
+                };
+                return names[type] || type;
+            }
+            
+            openCamera() {
+                const modal = document.getElementById('cameraModal');
+                modal.style.display = 'flex';
+                
+                // 重置UI状态
+                document.getElementById('cameraVideo').style.display = 'block';
+                document.getElementById('capturedImage').style.display = 'none';
+                document.getElementById('captureBtn').style.display = 'inline-flex';
+                document.getElementById('retakeBtn').style.display = 'none';
+                document.getElementById('savePhotoBtn').style.display = 'none';
+                
+                this.startCamera();
+            }
+            
+            async startCamera() {
+                try {
+                    if (this.cameraStream) {
+                        this.stopCamera();
+                    }
+                    
+                    const constraints = {
+                        video: {
+                            facingMode: 'environment', // 后置摄像头
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }
+                    };
+                    
+                    this.cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    const video = document.getElementById('cameraVideo');
+                    video.srcObject = this.cameraStream;
+                    
+                    this.showStatus('相机已启动', 'success');
+                } catch (error) {
+                    console.error('无法启动相机:', error);
+                    this.showStatus('无法访问相机，请检查权限', 'error');
+                    
+                    // 回退到文件选择
+                    setTimeout(() => {
+                        this.closeCamera();
+                        this.openAlbum();
+                    }, 2000);
+                }
+            }
+            
+            stopCamera() {
+                if (this.cameraStream) {
+                    this.cameraStream.getTracks().forEach(track => track.stop());
+                    this.cameraStream = null;
+                }
+            }
+            
+            capturePhoto() {
+                const video = document.getElementById('cameraVideo');
+                const canvas = document.getElementById('cameraCanvas');
+                const capturedImage = document.getElementById('capturedImage');
+                
+                // 设置canvas尺寸与视频相同
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                // 绘制视频帧到canvas
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // 显示拍摄的照片
+                const dataUrl = canvas.toDataURL('image/jpeg', this.photoQuality);
+                capturedImage.src = dataUrl;
+                
+                // 更新UI
+                video.style.display = 'none';
+                capturedImage.style.display = 'block';
+                document.getElementById('captureBtn').style.display = 'none';
+                document.getElementById('retakeBtn').style.display = 'inline-flex';
+                document.getElementById('savePhotoBtn').style.display = 'inline-flex';
+                
+                // 计算并显示压缩信息
+                this.calculateCompressionInfo(dataUrl);
+                
+                this.currentPhoto = dataUrl;
+                this.showStatus('照片已拍摄，点击保存按钮保存', 'success');
+            }
+            
+            calculateCompressionInfo(dataUrl) {
+                // 计算base64数据大小（字节）
+                const base64Length = dataUrl.length - 'data:image/jpeg;base64,'.length;
+                const fileSize = Math.round((base64Length * 3) / 4); // 近似计算
+                
+                // 转换为KB/MB
+                let compressedSize;
+                if (fileSize < 1024) {
+                    compressedSize = `${fileSize} B`;
+                } else if (fileSize < 1024 * 1024) {
+                    compressedSize = `${(fileSize / 1024).toFixed(1)} KB`;
+                } else {
+                    compressedSize = `${(fileSize / (1024 * 1024)).toFixed(2)} MB`;
+                }
+                
+                // 假设原始图片大小（这里使用估算）
+                const estimatedOriginalSize = fileSize * (1 / this.photoQuality);
+                let originalSize;
+                if (estimatedOriginalSize < 1024 * 1024) {
+                    originalSize = `${(estimatedOriginalSize / 1024).toFixed(1)} KB`;
+                } else {
+                    originalSize = `${(estimatedOriginalSize / (1024 * 1024)).toFixed(2)} MB`;
+                }
+                
+                const compressionRatio = `${Math.round((1 - this.photoQuality) * 100)}%`;
+                
+                // 更新显示
+                document.getElementById('originalSize').textContent = originalSize;
+                document.getElementById('compressedSize').textContent = compressedSize;
+                document.getElementById('compressionRatio').textContent = compressionRatio;
+            }
+            
+            retakePhoto() {
+                const video = document.getElementById('cameraVideo');
+                const capturedImage = document.getElementById('capturedImage');
+                
+                video.style.display = 'block';
+                capturedImage.style.display = 'none';
+                document.getElementById('captureBtn').style.display = 'inline-flex';
+                document.getElementById('retakeBtn').style.display = 'none';
+                document.getElementById('savePhotoBtn').style.display = 'none';
+                
+                this.currentPhoto = null;
+                this.showStatus('可以重新拍摄', 'warning');
+            }
+            
+            savePhoto() {
+                if (!this.currentPhoto) {
+                    this.showStatus('请先拍摄照片', 'error');
+                    return;
+                }
+                
+                this.savePhotoToStorage(this.currentPhoto);
+                this.closeCamera();
+            }
+            
+            openAlbum() {
+                const modal = document.getElementById('albumModal');
+                modal.style.display = 'flex';
+                
+                // 重置UI状态
+                document.getElementById('selectedImage').style.display = 'none';
+                document.getElementById('saveAlbumBtn').style.display = 'none';
+                this.currentPhoto = null;
+            }
+            
+            closeAlbum() {
+                document.getElementById('albumModal').style.display = 'none';
+                document.getElementById('albumInput').value = '';
+            }
+            
+            handleAlbumSelect(event) {
+                const file = event.target.files[0];
                 if (!file) return;
+                
+                // 检查文件大小（限制为10MB）
+                if (file.size > 10 * 1024 * 1024) {
+                    this.showStatus('图片太大，请选择小于10MB的图片', 'error');
+                    return;
+                }
+                
                 const reader = new FileReader();
-                reader.onload = (ev) => {
-                    pendingImages[cfg.key] = ev.target.result;
-                    thumb.src = ev.target.result;
-                    saveBtn.disabled = false;
-                    hint.classList.remove('show'); // 重置提示
+                reader.onload = (e) => {
+                    const image = new Image();
+                    image.onload = () => {
+                        // 压缩图片
+                        this.compressImage(image, (compressedDataUrl) => {
+                            this.currentPhoto = compressedDataUrl;
+                            document.getElementById('selectedImage').src = compressedDataUrl;
+                            document.getElementById('selectedImage').style.display = 'block';
+                            document.getElementById('saveAlbumBtn').style.display = 'inline-flex';
+                            
+                            this.showStatus('图片已选择，点击保存按钮保存', 'success');
+                        });
+                    };
+                    image.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
-                input.value = ''; // 允许重复选同一张
-            });
-        }
-        handleFileSelect(cameraInput);
-        handleFileSelect(albumInput);
-
-        // 保存按钮 —— 防重复点击
-        let isSaving = false;
-        saveBtn.addEventListener('click', () => {
-            if (isSaving) return;
-            const imgData = pendingImages[cfg.key];
-            if (!imgData) {
-                alert('请先拍摄或从相册选择一张照片～');
-                return;
             }
-            isSaving = true;
-            saveBtn.disabled = true;
-            saveBtn.textContent = '保存中...';
-
-            try {
-                savePhotoRecord(cfg.key, cfg.label, imgData);
-                pendingImages[cfg.key] = null;
-                // 重置缩略图
-                thumb.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eef2f8'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%238a99b0' font-size='11'%3E待拍照%3C/text%3E%3C/svg%3E";
-                saveBtn.textContent = `💾 保存${cfg.label === '其他时间段刷牙' ? '' : cfg.label.slice(2)}记录`;
-                hint.classList.add('show');
-                renderHistoryGallery();
-            } catch(err) {
-                alert('保存失败，请重试');
-                saveBtn.disabled = false;
-                saveBtn.textContent = `💾 保存${cfg.label === '其他时间段刷牙' ? '' : cfg.label.slice(2)}记录`;
+            
+            compressImage(image, callback) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 计算新尺寸，保持宽高比
+                let width = image.width;
+                let height = image.height;
+                
+                if (width > this.maxPhotoSize || height > this.maxPhotoSize) {
+                    if (width > height) {
+                        height = Math.round((height * this.maxPhotoSize) / width);
+                        width = this.maxPhotoSize;
+                    } else {
+                        width = Math.round((width * this.maxPhotoSize) / height);
+                        height = this.maxPhotoSize;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                
+                // 绘制并压缩
+                ctx.drawImage(image, 0, 0, width, height);
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', this.photoQuality);
+                
+                callback(compressedDataUrl);
             }
-            isSaving = false;
-        });
-    }
-
-    // ---- 保存照片到 localStorage ----
-    function savePhotoRecord(taskKey, taskLabel, imgData) {
-        const todayStr = getTodayStr();
-        const tasks = getTodayTasks();
-        const snap = [
-            tasks.morningBrush ? '✅晨刷' : '❌晨刷',
-            tasks.eveningBrush ? '✅晚刷' : '❌晚刷',
-            tasks.otherBrush   ? '✅其他时段' : '❌其他时段',
-        ].join(' · ');
-
-        const record = {
-            id: `${Date.now()}_${Math.random().toString(36).substr(2,5)}`,
-            timestamp: new Date().toISOString(),
-            dateStr: todayStr,
-            taskKey,
-            taskLabel,
-            imageDataUrl: imgData,
-            taskSnapshot: snap,
-        };
-
-        let photos = JSON.parse(localStorage.getItem(STORAGE_PHOTOS) || '[]');
-        photos.unshift(record);
-        if (photos.length > 60) photos = photos.slice(0, 60);
-        localStorage.setItem(STORAGE_PHOTOS, JSON.stringify(photos));
-    }
-
-    // ---- 渲染洁白相册 ----
-    function renderHistoryGallery() {
-        const container = document.getElementById('historyGalleryContainer');
-        const photos = JSON.parse(localStorage.getItem(STORAGE_PHOTOS) || '[]');
-
-        if (!photos.length) {
-            container.innerHTML = `<div class="empty-state">📷 暂无洁牙影像记录，完成清洁后拍照保存吧~</div>`;
-            return;
-        }
-
-        let html = `<div class="gallery-grid">`;
-        photos.forEach(p => {
-            const timeLabel = p.timestamp
-                ? new Date(p.timestamp).toLocaleString('zh-CN', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' })
-                : p.dateStr;
-            html += `
-                <div class="history-item">
-                    <img class="history-img" src="${p.imageDataUrl}" alt="牙齿记录">
-                    <div class="history-info">
-                        <div class="history-date">📅 ${p.dateStr} ${timeLabel} · ${p.taskLabel || ''}</div>
-                        <div class="history-note">🧾 ${p.taskSnapshot || '无快照'}</div>
-                    </div>
-                    <button class="delete-btn" data-id="${p.id}" title="删除">🗑️</button>
-                </div>`;
-        });
-        html += `</div>`;
-        container.innerHTML = html;
-
-        container.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (!confirm('删除这张照片记录？')) return;
-                let ps = JSON.parse(localStorage.getItem(STORAGE_PHOTOS) || '[]');
-                ps = ps.filter(p => p.id !== btn.dataset.id);
-                localStorage.setItem(STORAGE_PHOTOS, JSON.stringify(ps));
-                renderHistoryGallery();
-            });
-        });
-    }
-
-    // ---- 进度消息 ----
-    function updateProgressMessage() {
-        const tasks = getTodayTasks();
-        const count = [tasks.morningBrush, tasks.eveningBrush, tasks.otherBrush].filter(Boolean).length;
-        const msg = document.getElementById('dailyProgressMsg');
-        if (count === 3) {
-            msg.innerHTML = '🎉 太棒了！今日三项护理全部完成！继续保持洁白笑容 🎉';
-            msg.style.background = '#e0f2e9';
-            msg.style.color = '#1e6e3c';
-        } else {
-            msg.innerHTML = `📌 今日已完成 ${count}/3 项护理，继续加油～`;
-            msg.style.background = '#eef2ff';
-            msg.style.color = '#2c5f8a';
-        }
-    }
-
-    // ---- 渲染任务按钮初始状态 ----
-    function renderTaskStates() {
-        const tasks = getTodayTasks();
-        TASK_CONFIG.forEach(cfg => {
-            const item = document.getElementById(cfg.itemId);
-            const photoArea = document.getElementById(cfg.photoAreaId);
-            const doneBtn = item.querySelector(`.btn-sm[data-status="done"]`);
-            const pendingBtn = item.querySelector(`.btn-sm[data-status="pending"]`);
-            const isDone = tasks[cfg.key];
-            if (isDone) {
-                doneBtn.classList.add('active');
-                pendingBtn.classList.remove('active');
-                photoArea.classList.add('visible');
-            } else {
-                pendingBtn.classList.add('active');
-                doneBtn.classList.remove('active');
-                photoArea.classList.remove('visible');
+            
+            saveAlbumPhoto() {
+                if (!this.currentPhoto) {
+                    this.showStatus('请先选择图片', 'error');
+                    return;
+                }
+                
+                this.savePhotoToStorage(this.currentPhoto);
+                this.closeAlbum();
             }
+            
+            savePhotoToStorage(photoData) {
+                // 获取现有照片
+                const saved = localStorage.getItem('teeth_v2_photos');
+                const photos = saved ? JSON.parse(saved) : [];
+                
+                // 创建新照片记录
+                const now = new Date();
+                const dateString = now.toLocaleDateString('zh-CN');
+                const timeString = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                
+                const newPhoto = {
+                    data: photoData,
+                    date: `${dateString} ${timeString}`,
+                    taskType: this.currentTaskType,
+                    taskName: this.getTaskName(this.currentTaskType)
+                };
+                
+                // 添加到数组开头（最新照片显示在最前面）
+                photos.unshift(newPhoto);
+                
+                // 保存到localStorage
+                try {
+                    localStorage.setItem('teeth_v2_photos', JSON.stringify(photos));
+                    this.loadPhotos();
+                    this.showStatus('照片已保存到相册', 'success');
+                } catch (error) {
+                    console.error('保存照片失败:', error);
+                    
+                    if (error.name === 'QuotaExceededError') {
+                        this.showStatus('存储空间不足，请删除一些旧照片', 'error');
+                    } else {
+                        this.showStatus('保存失败，请重试', 'error');
+                    }
+                }
+            }
+            
+            closeCamera() {
+                this.stopCamera();
+                document.getElementById('cameraModal').style.display = 'none';
+                this.currentPhoto = null;
+            }
+            
+            showStatus(message, type = 'info') {
+                const statusElement = document.getElementById('statusMessage');
+                statusElement.textContent = message;
+                statusElement.className = `status-message status-${type}`;
+                statusElement.style.display = 'block';
+                
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    statusElement.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', () => {
+            window.teethHelper = new TeethHelper();
         });
-    }
-
-    // ---- Toast 提示 ----
-    function showToast(taskKey) {
-        const msgs = {
-            morningBrush: '🪥 晨刷提醒：45°角对准牙龈沟，小幅震颤，至少2分钟！',
-            eveningBrush: '🌙 晚刷提醒：认真清洁每个牙面，睡前刷牙最关键！',
-            otherBrush:   '☀️ 坚持额外刷牙，牙齿更洁白健康！',
-        };
-        const toast = document.createElement('div');
-        toast.innerText = msgs[taskKey] || '✅ 已记录！';
-        Object.assign(toast.style, {
-            position: 'fixed', bottom: '24px', left: '16px', right: '16px',
-            background: '#1e4a6e', color: 'white', padding: '12px 16px',
-            borderRadius: '50px', textAlign: 'center', fontSize: '0.78rem',
-            zIndex: '9999', boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
-            transition: 'opacity 0.3s',
-        });
-        document.body.appendChild(toast);
-        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2800);
-    }
-
-    // ---- 日期显示 ----
-    function setDateDisplay() {
-        const d = new Date();
-        const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
-        document.getElementById('currentDate').innerText =
-            `${getTodayStr()} ${weekdays[d.getDay()]}`;
-    }
-
-    // ---- 清空相册 ----
-    document.getElementById('clearAllHistoryBtn').addEventListener('click', () => {
-        if (!confirm('⚠️ 确定清空所有洁白相册记录吗？不可撤销。')) return;
-        localStorage.setItem(STORAGE_PHOTOS, '[]');
-        renderHistoryGallery();
-    });
-
-    // ---- 启动 ----
-    function init() {
-        setDateDisplay();
-        TASK_CONFIG.forEach(initTaskItem);
-        renderTaskStates();
-        updateProgressMessage();
-        renderHistoryGallery();
-    }
-
-    init();
-</script>
+    </script>
 </body>
 </html>
