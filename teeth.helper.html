@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>牙齿洁白提醒助手 | 洁牙记录与影像对比</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #f5f7fc;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            padding: 20px 16px 40px;
+            color: #1f2937;
+        }
+
+        /* 主容器 */
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 头部 */
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #2b6e9f, #1e4a6e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+        .header p {
+            font-size: 0.85rem;
+            color: #5c6f87;
+            margin-top: 6px;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.2s ease;
+            border: 1px solid #eef2f8;
+        }
+
+        /* 今日任务卡片 */
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .task-header h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+        }
+        .date-badge {
+            font-size: 0.75rem;
+            background: #eef3ff;
+            padding: 4px 12px;
+            border-radius: 40px;
+            color: #1e5a8a;
+        }
+        .routine-item {
+            background: #f9fafc;
+            border-radius: 20px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .routine-info {
+            flex: 2;
+        }
+        .routine-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .badge-tip {
+            background: #e6f4ea;
+            color: #2c6e3c;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: normal;
+        }
+        .desc {
+            font-size: 0.75rem;
+            color: #5a6e8a;
+            line-height: 1.4;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn-sm {
+            background: white;
+            border: 1px solid #cddae9;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #ffffff;
+            color: #2c5f8a;
+        }
+        .btn-sm.active {
+            background: #2b6e9f;
+            border-color: #2b6e9f;
+            color: white;
+            box-shadow: 0 2px 6px rgba(43,110,159,0.2);
+        }
+        .btn-primary {
+            background: #2b6e9f;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 44px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+            background: #1e5a8a;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #cbdbe0;
+            padding: 10px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* 拍照记录模块 */
+        .camera-area {
+            margin-top: 6px;
+        }
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 16px 0;
+            align-items: center;
+        }
+        .preview-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            object-fit: cover;
+            background: #eef2f8;
+            border: 1px solid #e0e7f0;
+        }
+        .capture-btn {
+            background: #f0f4f9;
+            border: 1px dashed #9aaebf;
+            border-radius: 48px;
+            padding: 8px 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        input[type="file"] {
+            display: none;
+        }
+
+        /* 历史记录画廊 */
+        .gallery-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .history-item {
+            background: #fefefe;
+            border-radius: 20px;
+            padding: 12px;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .history-img {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            object-fit: cover;
+            background: #eef2f8;
+            flex-shrink: 0;
+        }
+        .history-info {
+            flex: 1;
+        }
+        .history-date {
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .history-note {
+            font-size: 0.7rem;
+            color: #6c7c98;
+            margin-top: 4px;
+        }
+        .delete-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #a1b0c4;
+            cursor: pointer;
+            padding: 6px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 32px 16px;
+            color: #8c9bb0;
+            font-size: 0.85rem;
+        }
+
+        /* 进度提示 */
+        .progress-tag {
+            background: #eef2ff;
+            border-radius: 24px;
+            padding: 12px 16px;
+            font-size: 0.75rem;
+            color: #2c5f8a;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #9aaebe;
+            margin-top: 24px;
+        }
+        hr {
+            margin: 8px 0;
+            border-color: #eef2f8;
+        }
+        @media (max-width: 480px) {
+            body { padding: 16px 12px 32px; }
+            .routine-item { flex-direction: column; align-items: flex-start; }
+            .btn-group { align-self: flex-end; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <h1>🦷 洁白牙齿助手</h1>
+        <p>坚持记录 · 见证亮白变化</p>
+    </div>
+
+    <!-- 今日任务卡片 -->
+    <div class="card">
+        <div class="task-header">
+            <h2>📋 今日护理</h2>
+            <div class="date-badge" id="currentDate"></div>
+        </div>
+        <!-- 早晨刷牙 -->
+        <div class="routine-item" id="morningBrushItem">
+            <div class="routine-info">
+                <h3>🌅 晨间刷牙 <span class="badge-tip">≥2分钟 · 巴氏刷牙法</span></h3>
+                <div class="desc">牙刷45°角对准牙龈沟，小幅度震颤。电动牙刷更省力。</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-sm" data-task="morningBrush" data-status="done">✅ 完成</button>
+                <button class="btn-sm" data-task="morningBrush" data-status="pending">⏳ 未做</button>
+            </div>
+        </div>
+        <!-- 晚间刷牙 -->
+        <div class="routine-item" id="eveningBrushItem">
+            <div class="routine-info">
+                <h3>🌙 晚间刷牙 <span class="badge-tip">≥2分钟 · 巴氏刷牙法</span></h3>
+                <div class="desc">仔细清洁每个牙面，搭配电动牙刷更洁净。</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-sm" data-task="eveningBrush" data-status="done">✅ 完成</button>
+                <button class="btn-sm" data-task="eveningBrush" data-status="pending">⏳ 未做</button>
+            </div>
+        </div>
+        <!-- 牙线 -->
+        <div class="routine-item" id="flossItem">
+            <div class="routine-info">
+                <h3>🪥 牙线清洁 <span class="badge-tip">每晚刷牙前使用</span></h3>
+                <div class="desc">清理牙缝残渣，避免牙菌斑和口臭的关键一步。</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-sm" data-task="floss" data-status="done">✅ 完成</button>
+                <button class="btn-sm" data-task="floss" data-status="pending">⏳ 未做</button>
+            </div>
+        </div>
+        <div class="progress-tag" id="dailyProgressMsg">
+            今日进度：待完成
+        </div>
+    </div>
+
+    <!-- 拍照记录卡片 (清洁后拍照) -->
+    <div class="card">
+        <h2 style="font-size:1.25rem; margin-bottom:12px;">📸 洁牙后留影</h2>
+        <p style="font-size:0.75rem; color:#6c7c98; margin-bottom:12px;">每次完成清洁后拍下牙齿照片，记录洁白旅程。</p>
+        <div class="camera-area">
+            <div class="photo-preview" id="livePreviewArea">
+                <img id="currentPhotoPreview" class="preview-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eef2f8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%238a99b0' font-size='12'%3E预览%3C/text%3E%3C/svg%3E" alt="预览">
+                <button class="capture-btn" id="openCameraBtn">📷 拍摄/上传照片</button>
+            </div>
+            <input type="file" id="cameraInput" accept="image/*" capture="environment">
+            <button class="btn-primary" id="savePhotoRecordBtn" style="margin-top:12px;">💾 保存本次洁牙记录 + 照片</button>
+            <div class="desc" style="margin-top:10px; font-size:0.7rem;">* 每次保存会连同当前日期、已完成任务状态一同记录，可对比变化。</div>
+        </div>
+    </div>
+
+    <!-- 历史影像记录卡片 -->
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h2 style="font-size:1.25rem;">📅 洁白相册</h2>
+            <button id="clearAllHistoryBtn" class="btn-outline" style="padding:6px 12px; font-size:0.7rem;">清空全部</button>
+        </div>
+        <div id="historyGalleryContainer">
+            <!-- 动态渲染历史列表 -->
+            <div class="empty-state">暂无洁牙影像记录，完成清洁后拍照保存吧~</div>
+        </div>
+    </div>
+    <footer>✨ 巴氏刷牙法 + 牙线护理 | 每日打卡见证改变</footer>
+</div>
+
+<script>
+    // ---------- 存储key ----------
+    const STORAGE_TASKS = 'teeth_whiten_daily_tasks';     // 存储当天任务完成状态 { morningBrush, eveningBrush, floss, dateStr }
+    const STORAGE_PHOTOS = 'teeth_whiten_photos';         // 存储照片记录数组 [{ id, timestamp, dateStr, imageDataUrl, taskSnapshot }]
+
+    // ---------- 工具函数 ----------
+    function getTodayStr() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    // 获取当天任务状态
+    function getTodayTasks() {
+        const today = getTodayStr();
+        const stored = localStorage.getItem(STORAGE_TASKS);
+        let allTasks = stored ? JSON.parse(stored) : {};
+        if (!allTasks[today]) {
+            allTasks[today] = { morningBrush: false, eveningBrush: false, floss: false, dateStr: today };
+        }
+        // 确保对象存在
+        return allTasks[today];
+    }
+
+    // 更新当天某个任务
+    function updateTask(taskKey, completed) {
+        const today = getTodayStr();
+        const stored = localStorage.getItem(STORAGE_TASKS);
+        let allTasks = stored ? JSON.parse(stored) : {};
+        if (!allTasks[today]) {
+            allTasks[today] = { morningBrush: false, eveningBrush: false, floss: false, dateStr: today };
+        }
+        allTasks[today][taskKey] = completed;
+        localStorage.setItem(STORAGE_TASKS, JSON.stringify(allTasks));
+        renderDailyTasksUI();      // 刷新UI
+        updateProgressMessage();
+    }
+
+    // 获取当前待保存的临时照片 (base64)
+    let currentCapturedImageData = null;   // 暂存新拍的照片
+
+    // 拍照/上传逻辑
+    const cameraInput = document.getElementById('cameraInput');
+    const openCameraBtn = document.getElementById('openCameraBtn');
+    const previewImg = document.getElementById('currentPhotoPreview');
+
+    openCameraBtn.addEventListener('click', () => {
+        cameraInput.click();
+    });
+    cameraInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const imgData = ev.target.result;
+            currentCapturedImageData = imgData;
+            previewImg.src = imgData;
+        };
+        reader.readAsDataURL(file);
+        // 清空input value 允许再次上传同一文件
+        cameraInput.value = '';
+    });
+
+    // 保存照片记录 (连同当时任务完成情况的快照)
+    function savePhotoRecord() {
+        if (!currentCapturedImageData) {
+            alert("请先拍摄或上传一张牙齿照片再进行保存～");
+            return;
+        }
+        const todayStr = getTodayStr();
+        const tasksToday = getTodayTasks();
+        // 构建任务快照文本，便于观察当天的洁牙状况
+        const morningStatus = tasksToday.morningBrush ? "✅晨刷" : "❌晨刷未做";
+        const eveningStatus = tasksToday.eveningBrush ? "✅晚刷" : "❌晚刷未做";
+        const flossStatus = tasksToday.floss ? "✅牙线" : "❌牙线未用";
+        const taskSnapshotText = `${morningStatus} · ${eveningStatus} · ${flossStatus}`;
+
+        const photoRecord = {
+            id: Date.now() + Math.random().toString(36).substr(2, 6),
+            timestamp: new Date().toISOString(),
+            dateStr: todayStr,
+            imageDataUrl: currentCapturedImageData,
+            taskSnapshot: taskSnapshotText,
+            // 额外可存储今日完成任务数量
+        };
+
+        // 获取已有记录
+        let photoHistory = [];
+        const storedPhotos = localStorage.getItem(STORAGE_PHOTOS);
+        if (storedPhotos) {
+            photoHistory = JSON.parse(storedPhotos);
+        }
+        photoHistory.unshift(photoRecord); // 最新在上
+        // 限制最多存储30张图片，防止localStorage过大(但一般几十张ok)
+        if(photoHistory.length > 40) photoHistory = photoHistory.slice(0,40);
+        localStorage.setItem(STORAGE_PHOTOS, JSON.stringify(photoHistory));
+
+        // 清空当前预览与暂存图片 (不清也可以但最好重置，让用户知道已保存)
+        currentCapturedImageData = null;
+        previewImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eef2f8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%238a99b0' font-size='12'%3E预览%3C/text%3E%3C/svg%3E";
+        
+        renderHistoryGallery();    // 刷新相册
+        alert(`已保存 ${todayStr} 的洁牙影像及当日任务快照！\n${taskSnapshotText}`);
+    }
+
+    // 渲染历史相册
+    function renderHistoryGallery() {
+        const container = document.getElementById('historyGalleryContainer');
+        const stored = localStorage.getItem(STORAGE_PHOTOS);
+        let photos = [];
+        if (stored) photos = JSON.parse(stored);
+        
+        if (!photos.length) {
+            container.innerHTML = `<div class="empty-state">📷 暂无洁牙影像记录，完成清洁后拍照保存吧~</div>`;
+            return;
+        }
+
+        let html = `<div class="gallery-grid">`;
+        photos.forEach(photo => {
+            const displayDate = photo.dateStr;
+            const timeLabel = photo.timestamp ? new Date(photo.timestamp).toLocaleString().slice(0,16) : displayDate;
+            html += `
+                <div class="history-item" data-id="${photo.id}">
+                    <img class="history-img" src="${photo.imageDataUrl}" alt="牙齿记录">
+                    <div class="history-info">
+                        <div class="history-date">📅 ${displayDate} · ${timeLabel}</div>
+                        <div class="history-note">🧾 洁牙任务: ${photo.taskSnapshot || '无快照'}</div>
+                    </div>
+                    <button class="delete-btn" data-id="${photo.id}" title="删除这张记录">🗑️</button>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
+
+        // 绑定删除按钮事件
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = btn.getAttribute('data-id');
+                if(confirm('删除这张照片记录？不会影响今日打卡状态。')) {
+                    let currentPhotos = JSON.parse(localStorage.getItem(STORAGE_PHOTOS) || '[]');
+                    const newPhotos = currentPhotos.filter(p => p.id != id);
+                    localStorage.setItem(STORAGE_PHOTOS, JSON.stringify(newPhotos));
+                    renderHistoryGallery();
+                }
+            });
+        });
+    }
+
+    // 清空所有历史照片
+    function clearAllHistory() {
+        if(confirm('⚠️ 确定要清空所有洁白相册记录吗？此操作不可撤销。')) {
+            localStorage.setItem(STORAGE_PHOTOS, JSON.stringify([]));
+            renderHistoryGallery();
+            alert('已清空所有照片记录');
+        }
+    }
+
+    // 渲染今日任务UI (高亮按钮)
+    function renderDailyTasksUI() {
+        const tasks = getTodayTasks();
+        // morningBrush
+        setButtonActiveState('morningBrush', tasks.morningBrush);
+        setButtonActiveState('eveningBrush', tasks.eveningBrush);
+        setButtonActiveState('floss', tasks.floss);
+    }
+
+    function setButtonActiveState(taskKey, isDone) {
+        const container = document.getElementById(`${taskKey}Item`);
+        if(!container) return;
+        const doneBtn = container.querySelector(`.btn-sm[data-status="done"]`);
+        const pendingBtn = container.querySelector(`.btn-sm[data-status="pending"]`);
+        if(isDone) {
+            doneBtn.classList.add('active');
+            pendingBtn.classList.remove('active');
+        } else {
+            doneBtn.classList.remove('active');
+            pendingBtn.classList.add('active');
+        }
+    }
+
+    // 更新进度提示
+    function updateProgressMessage() {
+        const tasks = getTodayTasks();
+        let completedCount = 0;
+        if(tasks.morningBrush) completedCount++;
+        if(tasks.eveningBrush) completedCount++;
+        if(tasks.floss) completedCount++;
+        const msgDiv = document.getElementById('dailyProgressMsg');
+        if(completedCount === 3) {
+            msgDiv.innerHTML = '🎉 完美！今日三项洁牙全部完成！继续保持洁白笑容 🎉';
+            msgDiv.style.background = "#e0f2e9";
+        } else {
+            msgDiv.innerHTML = `📌 今日已完成 ${completedCount}/3 项（晨刷+晚刷+牙线） 继续加油～`;
+            msgDiv.style.background = "#eef2ff";
+        }
+    }
+
+    // 绑定任务按钮事件 (动态监听)
+    function bindTaskButtons() {
+        const allTaskBtns = document.querySelectorAll('.btn-sm[data-task]');
+        allTaskBtns.forEach(btn => {
+            btn.removeEventListener('click', taskClickHandler);
+            btn.addEventListener('click', taskClickHandler);
+        });
+    }
+
+    function taskClickHandler(e) {
+        const btn = e.currentTarget;
+        const task = btn.getAttribute('data-task');
+        const status = btn.getAttribute('data-status'); // 'done' 或 'pending'
+        const isCompleted = (status === 'done');
+        // 更新存储
+        updateTask(task, isCompleted);
+    }
+
+    // 设置日期显示
+    function setDateDisplay() {
+        const today = new Date();
+        const ymd = getTodayStr();
+        const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
+        const weekday = weekdays[today.getDay()];
+        document.getElementById('currentDate').innerText = `${ymd} ${weekday}`;
+    }
+
+    // 检查初始化: 如果当天从未有过任务数据则默认false
+    function initDefaultTasks() {
+        const today = getTodayStr();
+        const stored = localStorage.getItem(STORAGE_TASKS);
+        let allTasks = stored ? JSON.parse(stored) : {};
+        if(!allTasks[today]) {
+            allTasks[today] = { morningBrush: false, eveningBrush: false, floss: false, dateStr: today };
+            localStorage.setItem(STORAGE_TASKS, JSON.stringify(allTasks));
+        }
+        renderDailyTasksUI();
+        updateProgressMessage();
+    }
+
+    // 额外提醒：关于刷牙时长的简单提示（模拟）
+    function showBrushTip() {
+        // 不需要弹窗太打扰，但可以在点击完成时简单提醒一下巴氏刷牙法
+        // 在绑定任务完成时加额外toast风格提醒（轻提醒）
+        const originalUpdate = updateTask;
+        window.updateTask = updateTask; // 但我们可以代理一下完成时的提示
+        // 更优雅：在任务点击"完成"时判断如果是刷牙任务且此前未完成，提示刷牙时长与巴氏法
+        const originalHandler = taskClickHandler;
+        // 重新包装但保留原有逻辑, 但为了体验, 在updateTask里增加提醒不可控; 我们直接监听全局任务点击后显示非阻塞提示
+        document.querySelectorAll('.btn-sm[data-task]').forEach(btn => {
+            btn.removeEventListener('click', taskClickHandler);
+            btn.addEventListener('click', (e) => {
+                const task = btn.getAttribute('data-task');
+                const status = btn.getAttribute('data-status');
+                const isNowCompleted = (status === 'done');
+                // 获取当前任务原有状态（完成前）
+                const currentTasks = getTodayTasks();
+                let beforeStatus = false;
+                if(task === 'morningBrush') beforeStatus = currentTasks.morningBrush;
+                if(task === 'eveningBrush') beforeStatus = currentTasks.eveningBrush;
+                if(task === 'floss') beforeStatus = currentTasks.floss;
+                // 如果用户点击完成 (且之前状态为未完成)，显示刷牙建议
+                if(isNowCompleted && !beforeStatus && (task === 'morningBrush' || task === 'eveningBrush')) {
+                    // 轻提示
+                    const toastMsg = document.createElement('div');
+                    toastMsg.innerText = '🪥 巴氏刷牙法：牙刷45°对准牙龈沟，小幅度震颤，持续至少2分钟！';
+                    toastMsg.style.position = 'fixed';
+                    toastMsg.style.bottom = '20px';
+                    toastMsg.style.left = '16px';
+                    toastMsg.style.right = '16px';
+                    toastMsg.style.backgroundColor = '#2c5f8a';
+                    toastMsg.style.color = 'white';
+                    toastMsg.style.padding = '12px';
+                    toastMsg.style.borderRadius = '60px';
+                    toastMsg.style.textAlign = 'center';
+                    toastMsg.style.fontSize = '0.8rem';
+                    toastMsg.style.zIndex = '999';
+                    toastMsg.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+                    document.body.appendChild(toastMsg);
+                    setTimeout(() => toastMsg.remove(), 3000);
+                } else if (isNowCompleted && !beforeStatus && task === 'floss') {
+                    const toast = document.createElement('div');
+                    toast.innerText = '🦷 牙线使用技巧：轻滑入牙缝，C型包裹牙面刮除菌斑，每晚坚持口臭拜拜~';
+                    toast.style.cssText = 'position:fixed; bottom:20px; left:16px; right:16px; background:#3d6b47; color:white; padding:12px; border-radius:60px; text-align:center; font-size:0.8rem; z-index:999';
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3200);
+                }
+                // 执行原逻辑
+                updateTask(task, isNowCompleted);
+            });
+        });
+    }
+
+    // 全部渲染及初始化
+    function init() {
+        setDateDisplay();
+        initDefaultTasks();
+        bindTaskButtons();
+        renderHistoryGallery();
+        // 绑定保存照片按钮
+        document.getElementById('savePhotoRecordBtn').addEventListener('click', savePhotoRecord);
+        document.getElementById('clearAllHistoryBtn').addEventListener('click', clearAllHistory);
+        // 增强刷牙提示绑定
+        bindTaskButtons(); // 重新确保事件
+        // 二次封装提醒
+        setTimeout(() => {
+            // 重新绑定高级提醒（避免覆盖）
+            const advancedBind = () => {
+                const btns = document.querySelectorAll('.btn-sm[data-task]');
+                btns.forEach(btn => {
+                    const newBtn = btn.cloneNode(true);
+                    btn.parentNode.replaceChild(newBtn, btn);
+                    newBtn.addEventListener('click', (e) => {
+                        const task = newBtn.getAttribute('data-task');
+                        const status = newBtn.getAttribute('data-status');
+                        const currentTasks = getTodayTasks();
+                        let before = false;
+                        if(task === 'morningBrush') before = currentTasks.morningBrush;
+                        if(task === 'eveningBrush') before = currentTasks.eveningBrush;
+                        if(task === 'floss') before = currentTasks.floss;
+                        const isNowCompleting = (status === 'done');
+                        if(isNowCompleting && !before && (task === 'morningBrush' || task === 'eveningBrush')) {
+                            alert("✨ 巴氏刷牙法提醒：牙刷45度角对准牙龈沟，小幅度震颤，每次不少于2分钟。电动牙刷更省力 ✨");
+                        } else if(isNowCompleting && !before && task === 'floss') {
+                            alert("🪥 牙线提醒：每晚刷牙前使用，清理牙缝残渣，有效避免牙菌斑和口臭。");
+                        }
+                        updateTask(task, isNowCompleting);
+                    });
+                });
+            };
+            advancedBind();
+        }, 100);
+        // 同时更新进度
+        updateProgressMessage();
+    }
+    
+    init();
+</script>
+</body>
+</html>
